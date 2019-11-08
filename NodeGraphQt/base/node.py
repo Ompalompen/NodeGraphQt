@@ -3,17 +3,23 @@ from NodeGraphQt.base.commands import PropertyChangedCmd
 from NodeGraphQt.base.model import NodeModel
 from NodeGraphQt.base.port import Port
 from NodeGraphQt.constants import (NODE_PROP,
+                                   NODE_PROP_QLABEL,
                                    NODE_PROP_QLINEEDIT,
                                    NODE_PROP_QTEXTEDIT,
                                    NODE_PROP_QCOMBO,
                                    NODE_PROP_QCHECKBOX,
-                                   IN_PORT, OUT_PORT)
+                                   IN_PORT, OUT_PORT,
+                                   NODE_PROP_GROUPVIEW)
 from NodeGraphQt.errors import PortRegistrationError
 from NodeGraphQt.qgraphics.node_backdrop import BackdropNodeItem
 from NodeGraphQt.qgraphics.node_base import NodeItem
 from NodeGraphQt.widgets.node_property import (NodeComboBox,
                                                NodeLineEdit,
-                                               NodeCheckBox)
+                                               NodeCheckBox,
+                                               NodeListView,
+                                               NodeLabel,
+                                               GroupNodeLabel)
+import Group
 
 
 class classproperty(object):
@@ -239,6 +245,22 @@ class NodeObject(object):
         """
         self.model.add_property(name, value, items, range, widget_type, tab)
 
+    def create_group_property(self, name, value, group: Group, items=None, range=None,
+                        widget_type=NODE_PROP, tab=None):
+        """
+        Creates a custom property to the node.
+
+        Args:
+            name (str): name of the property.
+            value (object): data.
+            items (list[str]): items used by widget type NODE_PROP_QCOMBO
+            range (tuple)): min, max values used by NODE_PROP_SLIDER
+            widget_type (int): widget flag to display in the properties bin.
+            tab (str): name of the widget tab to display in the properties bin.
+        """
+        self.model.add_group(group)
+        self.model.add_property(name, value, items, range, widget_type, tab)
+
     def properties(self):
         """
         Returns all the node properties.
@@ -301,6 +323,13 @@ class NodeObject(object):
             bool: true if property name exists in the Node.
         """
         return name in self.model.properties.keys()
+
+    def clear_properties(self):
+        self.model.clear_properties()
+        for name, item in self.view.widgets.items():
+            del item
+        self.view.widgets.clear()
+            
 
     def set_x_pos(self, x):
         """
@@ -459,6 +488,43 @@ class BaseNode(NodeObject):
         widget = NodeCheckBox(self.view, name, label, text, state)
         widget.value_changed.connect(lambda k, v: self.set_property(k, v))
         self.view.add_widget(widget)
+
+    def add_text(self, name='', label='', text='', tab=None):
+        """
+        Create a custom property and embed a
+        :class:`PySide2.QtWidgets.QLabel` widget into the node.
+
+        Args:
+            name (str): name for the custom property.
+            label (str): label to be displayed.
+            text (str): label text.
+            tab (str): name of the widget tab to display in.
+        """
+        self.create_property(
+            name, text, widget_type=NODE_PROP_QLABEL, tab=tab)
+        widget = NodeLabel(self.view, name, label, text)
+        widget.value_changed.connect(lambda k, v: self.set_property(k, v))
+        self.view.add_widget(widget)
+
+    def add_group(self, group: Group, hidden=False ,tab=None):
+        """
+        Create a custom property and embed a
+        :class:`PySide2.QtWidgets.QLabel` widget into the node.
+
+        Args:
+            name (str): name for the custom property.
+            label (str): label to be displayed.
+            text (str): label text.
+            tab (str): name of the widget tab to display in.
+        """
+        self.create_property(
+             "Group", group, widget_type=NODE_PROP if hidden else NODE_PROP_GROUPVIEW, tab=tab)
+
+        if not hidden:
+            widget = GroupNodeLabel(self.view, group)
+            widget.value_changed.connect(lambda k, v: self.set_property(k, v))
+            self.view.add_widget(widget)
+            self.view.update()
 
     def add_input(self, name='input', multi_input=False, display_name=True,
                   color=None):

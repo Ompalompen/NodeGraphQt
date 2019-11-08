@@ -8,7 +8,8 @@ from NodeGraphQt.constants import (NODE_PROP,
                                    NODE_PROP_QCHECKBOX,
                                    NODE_PROP_COLORPICKER)
 from NodeGraphQt.errors import NodePropertyError
-
+import Group
+from typing import List
 
 class PortModel(object):
 
@@ -91,6 +92,9 @@ class NodeModel(object):
             'outputs': NODE_PROP,
         }
 
+    def add_group(self, group):
+        self._group.append(group)
+
     def add_property(self, name, value, items=None, range=None,
                      widget_type=NODE_PROP, tab='Properties'):
         """
@@ -145,6 +149,11 @@ class NodeModel(object):
         if name in self.properties.keys():
             return self.properties[name]
         return self._custom_prop.get(name)
+
+    def clear_properties(self):
+        self.properties.clear()
+        self.custom_properties.clear()
+        self._graph_model.common_properties().clear()
 
     def get_widget_type(self, name):
         model = self._graph_model

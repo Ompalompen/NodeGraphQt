@@ -9,8 +9,10 @@ from NodeGraphQt.constants import (NODE_PROP_QLABEL,
                                    NODE_PROP_QCHECKBOX,
                                    NODE_PROP_QSPINBOX,
                                    NODE_PROP_COLORPICKER,
-                                   NODE_PROP_SLIDER)
-
+                                   NODE_PROP_SLIDER,
+                                   NODE_PROP_LISTVIEW,
+                                   NODE_PROP_GROUPVIEW)
+import Group
 
 class BaseProperty(QtWidgets.QWidget):
 
@@ -168,6 +170,17 @@ class PropLabel(QtWidgets.QLabel):
             self.setText(value)
             self.value_changed.emit(self.toolTip(), value)
 
+class PropGroupView(QtWidgets.QLabel):
+
+    value_changed = QtCore.Signal(str, object)
+
+    def get_value(self):
+        return self.text()
+
+    def set_value(self, value: Group):
+        if value.name() != self.get_value():
+            self.setText(value.name())
+            self.value_changed.emit(self.toolTip(), value.name())
 
 class PropLineEdit(QtWidgets.QLineEdit):
 
@@ -299,6 +312,17 @@ class PropSpinBox(QtWidgets.QSpinBox):
         if value != self.get_value():
             self.setValue(value)
 
+class PropListView(BaseProperty):
+
+    value_changed = QtCore.Signal(str, object)
+
+    def get_value(self):
+        return self.text()
+
+    def set_value(self, value):
+        if value != self.get_value():
+            self.setText(value)
+            self.value_changed.emit(self.toolTip(), value)
 
 WIDGET_MAP = {
     NODE_PROP_QLABEL:       PropLabel,
@@ -309,6 +333,8 @@ WIDGET_MAP = {
     NODE_PROP_QSPINBOX:     PropSpinBox,
     NODE_PROP_COLORPICKER:  PropColorPicker,
     NODE_PROP_SLIDER:       PropSlider,
+    NODE_PROP_LISTVIEW:     PropListView,
+    NODE_PROP_GROUPVIEW:    PropGroupView
 }
 
 

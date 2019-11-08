@@ -46,6 +46,16 @@ QTextEdit {
 }
 '''
 
+STYLE_QLABEL = '''
+QLabel {
+    border: 0px solid rgba(255, 255, 255, 50);
+    border-radius: 0px;
+    color: rgba(255, 255, 255, 150);
+    background: rgba(0, 0, 0, 0);
+    selection-background-color: rgba(255, 198, 10, 155);
+}
+'''
+
 STYLE_TABSEARCH = '''
 QLineEdit {
     border: 2px solid rgba(170, 140, 0, 255);

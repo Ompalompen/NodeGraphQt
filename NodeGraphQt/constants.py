@@ -66,6 +66,10 @@ NODE_PROP_QSPINBOX = 7
 NODE_PROP_COLORPICKER = 8
 #: Property type represented with a Slider widget in the properties bin.
 NODE_PROP_SLIDER = 9
+#: Property type represented with a ListView widget in the properties bin.
+NODE_PROP_LISTVIEW = 10
+#: Property type represented with a Group widget in the properties bin.
+NODE_PROP_GROUPVIEW = 11
 
 # === NODE VIEWER ===
 

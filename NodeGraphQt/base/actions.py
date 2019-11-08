@@ -3,7 +3,6 @@ from distutils.version import LooseVersion
 
 from NodeGraphQt import QtGui, QtCore
 
-
 def setup_context_menu(graph):
     """
     Sets up the node graphs context menu with some basic menus and commands.
@@ -13,10 +12,16 @@ def setup_context_menu(graph):
     """
     root_menu = graph.context_menu()
 
+    create_menu = root_menu.add_menu('&Create')
     file_menu = root_menu.add_menu('&File')
     edit_menu = root_menu.add_menu('&Edit')
 
     # create "File" menu.
+    create_menu.add_command('Add Filter Node', lambda: _add_node(graph, 'com.volvo.FilterNode'))
+    create_menu.add_command('Add Combine Node', lambda: _add_node(graph, 'com.volvo.CombineNode'))
+    create_menu.add_command('Add Order Node', lambda: _add_node(graph, 'com.volvo.OrderNode'))
+    create_menu.add_command('Add Output Node', lambda: _add_node(graph, 'com.volvo.OutputNode'))
+
     file_menu.add_command('Open...',
                           lambda: _open_session(graph),
                           QtGui.QKeySequence.Open)
@@ -88,6 +93,18 @@ def _zoom_in(graph):
     zoom = graph.get_zoom() + 0.1
     graph.set_zoom(zoom)
 
+def _add_node(graph, nodetype: str):
+    """
+    Set the node graph to zoom in by 0.1
+
+    Args:
+        graph (NodeGraphQt.NodeGraph): node graph.
+    """
+    graph.create_node(nodetype,
+                        name='',
+                        color='#0a1e20',
+                        text_color='#feab20',
+                        pos=[210, 310])
 
 def _zoom_out(graph):
     """
